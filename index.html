@@ -1,0 +1,70 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>Vinci Electric Vehicles</title>
+  <meta name="description" content="Vinci Electric Vehicles: hatch, SUV, sedã, cupê, picape e van 100% elétricos." />
+  <link rel="icon" href="logo.svg" type="image/svg+xml" />
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link href="https://fonts.googleapis.com/css2?family=Kumbh+Sans:wght@300;400;600&family=Michroma&display=swap" rel="stylesheet" />
+  <link rel="stylesheet" href="style.css" />
+  <link rel="stylesheet" href="extra.css" />
+</head>
+<body>
+  <div id="app">
+    <site-header active="home"></site-header>
+
+    <main>
+      <!-- Hero (modelo em destaque) -->
+      <section class="hero hero--gradient">
+        <car-art class="hero__car" :model="featured"></car-art>
+        <div class="container">
+          <h1>Vinci Model {{ featured.name }}</h1>
+          <p>{{ featured.description }}</p>
+          <div class="btn-row">
+            <a href="#modelos" class="btn btn--primary">Modelos</a>
+            <a :href="'modelo.html?id=' + featured.id" class="btn btn--ghost">Test Drive</a>
+          </div>
+        </div>
+      </section>
+
+      <!-- Sobre -->
+      <section id="sobre" class="about reveal">
+        <h2>Tecnologia aliada ao futuro</h2>
+        <p>A Vinci desenvolve veículos 100% elétricos para cada necessidade: do hatch urbano à picape de trabalho. Todos os modelos compartilham a mesma plataforma, o sistema Smartlink e garantia estendida na bateria.</p>
+      </section>
+
+      <!-- Modelos -->
+      <section id="modelos" class="models">
+        <model-card class="reveal" v-for="m in models" :key="m.id" :model="m"></model-card>
+      </section>
+
+      <div class="container" style="text-align:center;padding-bottom:20px">
+        <a href="veiculos.html" class="btn btn--outline">Ver todos os veículos</a>
+      </div>
+
+      <!-- CTAs -->
+      <section class="cta-list container reveal">
+        <a v-for="c in ctas" :key="c" href="#">{{ c }} <icon-chevron></icon-chevron></a>
+      </section>
+    </main>
+
+    <site-footer></site-footer>
+  </div>
+
+  <script src="https://unpkg.com/vue@3/dist/vue.global.prod.js"></script>
+  <script src="vehicles.js"></script>
+  <script src="components.js"></script>
+  <script>
+    mountVinci({
+      setup() {
+        const featured = VINCI_MODELS.find(m => m.id === "v3");
+        const ctas = ["Agende um test drive", "Veja ofertas", "Encontre uma loja"];
+        return { featured, models: VINCI_MODELS, ctas };
+      },
+    });
+  </script>
+</body>
+</html>

@@ -1,0 +1,52 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>Veículos | Vinci</title>
+  <meta name="description" content="Conheça todos os modelos elétricos da Vinci." />
+  <link rel="icon" href="logo.svg" type="image/svg+xml" />
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link href="https://fonts.googleapis.com/css2?family=Kumbh+Sans:wght@300;400;600&family=Michroma&display=swap" rel="stylesheet" />
+  <link rel="stylesheet" href="style.css" />
+  <link rel="stylesheet" href="extra.css" />
+</head>
+<body>
+  <div id="app">
+    <site-header active="veiculos"></site-header>
+
+    <main>
+      <section class="page-head">
+        <h1>Nossos veículos</h1>
+        <p>Seis modelos elétricos para estilos de vida diferentes. Filtre por categoria e conheça cada detalhe.</p>
+      </section>
+
+      <div class="filters">
+        <button v-for="c in categories" :key="c" class="chip" :class="{ 'is-on': selected === c }" @click="selected = c">{{ c }}</button>
+      </div>
+      <p class="catalog-count">{{ list.length }} {{ list.length === 1 ? 'modelo' : 'modelos' }}</p>
+
+      <section class="models">
+        <model-card v-for="m in list" :key="m.id" :model="m"></model-card>
+      </section>
+    </main>
+
+    <site-footer></site-footer>
+  </div>
+
+  <script src="https://unpkg.com/vue@3/dist/vue.global.prod.js"></script>
+  <script src="vehicles.js"></script>
+  <script src="components.js"></script>
+  <script>
+    mountVinci({
+      setup() {
+        const categories = ["Todos", ...new Set(VINCI_MODELS.map(m => m.category))];
+        const selected = ref("Todos");
+        const list = computed(() => selected.value === "Todos" ? VINCI_MODELS : VINCI_MODELS.filter(m => m.category === selected.value));
+        return { categories, selected, list };
+      },
+    });
+  </script>
+</body>
+</html>

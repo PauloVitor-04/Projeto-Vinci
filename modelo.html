@@ -1,0 +1,136 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>Vinci Model</title>
+  <meta name="description" content="Conheça os modelos elétricos da Vinci." />
+  <link rel="icon" href="logo.svg" type="image/svg+xml" />
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link href="https://fonts.googleapis.com/css2?family=Kumbh+Sans:wght@300;400;600&family=Michroma&display=swap" rel="stylesheet" />
+  <link rel="stylesheet" href="style.css" />
+  <link rel="stylesheet" href="extra.css" />
+</head>
+<body>
+  <div id="app">
+    <site-header active="veiculos"></site-header>
+
+    <main>
+      <!-- Hero -->
+      <section class="hero hero--center">
+        <div class="hero__vehicle"><car-art :model="model" :color="color"></car-art></div>
+        <div class="swatches" role="group" aria-label="Cor do veículo">
+          <button v-for="c in colors" :key="c.hex" class="swatch" :class="{ 'is-on': color === c.hex }"
+                  :style="{ background: c.hex }" :title="c.name" :aria-label="c.name" @click="color = c.hex"></button>
+          <span class="swatches__name">{{ colorName }}</span>
+        </div>
+        <p class="tagline">{{ model.category }} · {{ model.tagline }}</p>
+        <h1 class="display">Vinci Model {{ model.name }}</h1>
+        <p>{{ model.description }}</p>
+        <div class="btn-row">
+          <a href="veiculos.html" class="btn btn--primary">Modelos</a>
+          <a href="#" class="btn btn--outline">Test Drive</a>
+        </div>
+      </section>
+
+      <!-- Números -->
+      <section class="stats reveal">
+        <p class="eyebrow">Tecnologia aliada ao futuro</p>
+        <div class="stats__grid">
+          <stat-item v-for="s in stats" :key="model.id + s.label" :value="s.value" :suffix="s.suffix" :label="s.label"></stat-item>
+        </div>
+      </section>
+
+      <!-- Diferenciais -->
+      <section class="features reveal">
+        <article class="feature" v-for="f in features" :key="f.t">
+          <h3>{{ f.t }}</h3>
+          <p>{{ f.d }}</p>
+        </article>
+      </section>
+
+      <!-- Hotspots -->
+      <hotspot-viewer :model="model" :color="color"></hotspot-viewer>
+
+      <!-- Ficha técnica -->
+      <section class="specsheet container reveal">
+        <h2>Ficha técnica</h2>
+        <dl>
+          <div class="row" v-for="r in sheet" :key="r[0]"><dt>{{ r[0] }}</dt><dd>{{ r[1] }}</dd></div>
+        </dl>
+      </section>
+
+      <!-- FAQ -->
+      <section class="faq reveal">
+        <div class="faq__head">
+          <h2>FAQ</h2>
+          <p class="eyebrow">Perguntas frequentes</p>
+        </div>
+        <faq-list :items="faq"></faq-list>
+      </section>
+
+      <!-- Outros modelos -->
+      <section class="related container reveal">
+        <h2>Veja também</h2>
+        <div class="grid">
+          <a class="mini" v-for="m in others" :key="m.id" :href="'modelo.html?id=' + m.id">
+            <car-art :model="m"></car-art>
+            <h3>Model {{ m.name }}</h3>
+            <p>{{ m.tagline }}</p>
+            <span class="link-ul" style="font-family:var(--font-display);font-size:9px;letter-spacing:.1em">CONHEÇA</span>
+          </a>
+        </div>
+      </section>
+    </main>
+
+    <site-footer></site-footer>
+  </div>
+
+  <script src="https://unpkg.com/vue@3/dist/vue.global.prod.js"></script>
+  <script src="vehicles.js"></script>
+  <script src="components.js"></script>
+  <script>
+    mountVinci({
+      setup() {
+        const id = new URLSearchParams(location.search).get("id");
+        const model = VINCI_MODELS.find(m => m.id === id) || VINCI_MODELS[1];
+        document.title = `Vinci Model ${model.name} | ${model.tagline}`;
+        document.querySelector('meta[name="description"]').setAttribute("content", model.description);
+
+        // cores: a de fábrica primeiro, depois as demais
+        const colors = [{ name: "Cor original", hex: model.color }, ...VINCI_COLORS.filter(c => c.hex !== model.color)];
+        const color = ref(model.color);
+        const colorName = computed(() => (colors.find(c => c.hex === color.value) || {}).name);
+
+        const stats = [
+          { value: model.maxRange, suffix: "KM", label: "Com 1 carga" },
+          { value: model.torque, suffix: "RPM", label: "De torque" },
+          { value: model.warranty, suffix: "Anos", label: "Garantia" },
+        ];
+        const features = [
+          { t: "Recarga rápida", d: `Bateria de ${model.battery}: ${model.charge}.` },
+          { t: "Painel de instrumentos", d: model.dash },
+          { t: "Pontos de recarga", d: "O Smartlink mostra no mapa os pontos de recarga compatíveis ao longo da rota." },
+          { t: "Design premiado", d: model.design },
+        ];
+        const sheet = [
+          ["Categoria", model.category],
+          ["Potência", `${model.power} cavalos`],
+          ["Torque", `${model.torque.toLocaleString("pt-BR")} rpm`],
+          ["0 a 100 km/h", model.accel],
+          ["Autonomia", `${model.range} km (até ${model.maxRange} km)`],
+          ["Bateria", model.battery],
+          ["Recarga rápida", model.charge],
+          ["Peso", `${model.weight} kg`],
+          ["Lugares", String(model.seats)],
+          ["Tecnologia", model.tech],
+          ["Garantia da bateria", `${model.warranty} anos`],
+        ];
+        const others = VINCI_MODELS.filter(m => m.id !== model.id).slice(0, 3);
+        return { model, colors, color, colorName, stats, features, sheet, faq: vinciFaq(model), others };
+      },
+    });
+  </script>
+</body>
+</html>
